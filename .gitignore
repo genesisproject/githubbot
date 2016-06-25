@@ -1,2 +1,3 @@
 .populate_credentials
 *.pyc
+__pycache__
