@@ -1,0 +1,4 @@
+requests
+Flask
+git+https://github.com/Rapptz/discord.py@async
+
