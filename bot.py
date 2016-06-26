@@ -55,7 +55,8 @@ t = threading.Thread(target=start_discord_client)
 t.start()
 
 @dc.event
-async def on_ready():
+@asyncio.coroutine
+def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
