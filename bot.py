@@ -94,7 +94,7 @@ def ucb_build_status(status, data):
     status_emoji = {'succeeded': '☑', 'failed': '☒', 'cancelled': '©'}
 
     return "{status_emoji} [**{project}**] Build #{build_n} (target:{target}) {status}".format(status_emoji=status_emoji.get(status, ''),
-                            project=project, build_n=build_number, target=build_target, stat=status)
+                            project=project, build_n=build_number, target=build_target, status=status)
 
 ucb_message_template_functions = {
     'ProjectBuildStarted': functools.partial(ucb_build_status, 'started'),
