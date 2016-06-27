@@ -102,8 +102,8 @@ ucb_message_template_functions = {
     'ProjectBuildCanceled': functools.partial(ucb_build_status, 'canceled')
 }
 
-@app.route('/unity-cloud-build-hook', methods=["POST"])
-def gh_hook():
+@app.route('/ucb-hook', methods=["POST"])
+def ucb_hook():
     event_type = request.headers.get('X-UnityCloudBuild-Event')
     data = request.get_json()
     print('Unity Cloud Build hook route called')
