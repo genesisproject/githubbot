@@ -88,15 +88,16 @@ def gh_hook():
 
 def ucb_build_status(status, data):
     project = data['projectName']
-    build_target = data['build_target']
+    build_target = data['buildTargetName']
     build_number = data['buildNumber']
 
     status_emoji = {'succeeded': '☑', 'failed': '☒', 'cancelled': '©'}
 
-    return "{statemoji} [**{project}**] Build #{build_n} (target:{target}) {status}".format(stateemoji=status_emoji,
+    return "{statemoji} [**{project}**] Build #{build_n} (target:{target}) {status}".format(stateemoji=status_emoji.get(status, default=''),
                             project=project, build_n=build_number, target=build_target, stat=status)
 
 ucb_message_template_functions = {
+    'ProjectBuildStarted': functools.partial(ucb_build_status, 'started'),
     'ProjectBuildSuccess': functools.partial(ucb_build_status, 'succeeded'),
     'ProjectBuildFailure': functools.partial(ucb_build_status, 'failed'),
     'ProjectBuildCanceled': functools.partial(ucb_build_status, 'canceled')
