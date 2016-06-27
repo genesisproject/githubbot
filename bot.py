@@ -21,7 +21,7 @@ def shorten_url(url):
     r = requests.post('https://git.io', data={'url': url})
     return r.headers['Location']
 
-def push_message(data):
+def gh_push_message(data):
     repo = data['repository']['full_name']
     commits = data['commits']
     branch = data['ref'].split('/')[-1]
@@ -40,8 +40,8 @@ def push_message(data):
 
     return message
 
-message_template_functions = {
-    "push": push_message
+github_message_template_functions = {
+    "push": gh_push_message
 }
 
 app = Flask(__name__)
@@ -66,11 +66,52 @@ def on_ready():
 def gh_hook():
     event_type = request.headers.get('X-Github-Event')
     data = request.get_json()
+    print('Github hook route called.')
     print('Got a webhook request for event type: %s' % event_type)
 
     # get a message to send to the Discord channel
-    if event_type in message_template_functions:
-        message = message_template_functions[event_type](data)
+    if event_type in github_message_template_functions:
+        message = github_message_template_functions[event_type](data)
+    else:
+        print('Unhandled event of type %s' % event_type)
+        return ''
+
+    print(message)
+    server = discord.utils.get(dc.servers, name=DISCORD_SERVER)
+    channel = discord.utils.get(server.channels, name=DISCORD_CHANNEL)
+    print("Sending message to channel %s on server %s" % (channel, server))
+
+    asyncio.run_coroutine_threadsafe(dc.send_message(channel, message), dc.loop).result()
+
+    return ''
+
+
+def ucb_build_status(status, data):
+    project = data['projectName']
+    build_target = data['build_target']
+    build_number = data['buildNumber']
+
+    status_emoji = {'succeeded': '☑', 'failed': '☒', 'cancelled': '©'}
+
+    return "{statemoji} [**{project}**] Build #{build_n} (target:{target}) {status}".format(stateemoji=status_emoji,
+                            project=project, build_n=build_number, target=build_target, stat=status)
+
+ucb_message_template_functions = {
+    'ProjectBuildSuccess': functools.partial(ucb_build_status, 'succeeded'),
+    'ProjectBuildFailure': functools.partial(ucb_build_status, 'failed'),
+    'ProjectBuildCanceled': functools.partial(ucb_build_status, 'canceled')
+}
+
+@app.route('/unity-cloud-build-hook', methods=["POST"])
+def gh_hook():
+    event_type = request.headers.get('X-UnityCloudBuild-Event')
+    data = request.get_json()
+    print('Unity Cloud Build hook route called')
+    print('Got a webhook request for event type: %s' % event_type)
+
+    # get a message to send to the Discord channel
+    if event_type in ucb_message_template_functions:
+        message = ucb_message_template_functions[event_type](data)
     else:
         print('Unhandled event of type %s' % event_type)
         return ''
