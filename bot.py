@@ -18,11 +18,11 @@ DISCORD_CHANNEL = os.environ["DISCORD_CHANNEL"]
 DISCORD_TOKEN = os.environ["DISCORD_TOKEN"]
 
 def shorten_url(url):
-    r = requests.post('https://git.io', data={'url': url})
-    return r.headers['Location']
+    r = requests.post('https://v.gd/create.php', data={'format': 'simple', 'url': url})
+    return r.text
 
 def gl_push_message(data):
-    repo = data['repository']['full_name']
+    repo = data['repository']['name']
     commits = data['commits']
     branch = data['ref'].split('/')[-1]
 
