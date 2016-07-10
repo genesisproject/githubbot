@@ -32,7 +32,7 @@ def gl_push_message(data):
     for commit in commits:
         author = commit['author']
         shorturl = shorten_url(commit['url'])
-        message += "\n{url}: {hash} ↪ {description} ↬ {branch} ↯ {user}".format(url=shorturl,
+        message += "\n<{url}>: {hash} ↪ {description} ↬ {branch} ↯ {user}".format(url=shorturl,
                         hash=commit['id'][0:7],
                         description=commit['message'].splitlines()[0],
                         branch=branch,
