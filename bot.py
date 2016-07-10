@@ -41,7 +41,7 @@ def gl_push_message(data):
     return message
 
 gl_message_template_functions = {
-    "push hook": gh_push_message
+    "push hook": gl_push_message
 }
 
 app = Flask(__name__)
