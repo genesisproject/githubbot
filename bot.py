@@ -21,7 +21,7 @@ def shorten_url(url):
     r = requests.post('https://git.io', data={'url': url})
     return r.headers['Location']
 
-def gh_push_message(data):
+def gl_push_message(data):
     repo = data['repository']['full_name']
     commits = data['commits']
     branch = data['ref'].split('/')[-1]
@@ -40,8 +40,8 @@ def gh_push_message(data):
 
     return message
 
-github_message_template_functions = {
-    "push": gh_push_message
+gl_message_template_functions = {
+    "push hook": gh_push_message
 }
 
 app = Flask(__name__)
@@ -62,16 +62,16 @@ def on_ready():
     print(client.user.id)
     print('------')
 
-@app.route('/gh-hook', methods=["POST"])
-def gh_hook():
-    event_type = request.headers.get('X-Github-Event')
+@app.route('/gl-hook', methods=["POST"])
+def gl_hook():
+    event_type = request.headers.get('X-Gitlab-Event').lower()
     data = request.get_json()
-    print('Github hook route called.')
+    print('Gitlab hook route called.')
     print('Got a webhook request for event type: %s' % event_type)
 
     # get a message to send to the Discord channel
-    if event_type in github_message_template_functions:
-        message = github_message_template_functions[event_type](data)
+    if event_type in gl_message_template_functions:
+        message = gl_message_template_functions[event_type](data)
     else:
         print('Unhandled event of type %s' % event_type)
         return ''
